@@ -27,10 +27,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(16px, 5vw, 32px);
+  padding: 12px;
   max-width: 800px;
-  width: 100%;
-  margin: clamp(16px, 5vw, 32px) auto;
+  width: 95%;
+  margin: 12px auto;
   background: #FFFFFF;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
@@ -38,15 +38,18 @@ body {
 
 .game-controls {
   display: flex;
-  gap: clamp(8px, 3vw, 20px);
-  margin-bottom: clamp(16px, 5vw, 30px);
+  gap: 8px;
+  margin-bottom: 16px;
   justify-content: center;
   flex-wrap: wrap;
+  width: 100%;
+  padding: 0 8px;
 }
 
 .game-controls button {
-  padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
-  font-size: clamp(12px, 3vw, 14px);
+  padding: 8px 16px;
+  font-size: 14px;
+  min-width: 120px;
   cursor: pointer;
   background-color: var(--secondary-color);
   color: white;
@@ -68,17 +71,20 @@ body {
 }
 
 .game-status {
-  font-size: 18px;
-  margin-bottom: 24px;
+  font-size: 16px;
+  margin-bottom: 16px;
   font-weight: 500;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   color: var(--text-color);
-  padding: 16px;
+  padding: 12px;
   background: #F2F2F7;
   border-radius: 8px;
+  width: 100%;
+  max-width: 90vw;
+  text-align: center;
 }
 
 .restart-button {
@@ -101,9 +107,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: clamp(16px, 4vw, 20px);
-    margin: clamp(16px, 5vw, 32px) auto;
-    padding: clamp(16px, 5vw, 32px);
+    gap: 16px;
+    margin: 16px auto;
+    padding: 16px;
     max-width: 400px;
     width: 90%;
     background: #FFFFFF;
@@ -162,13 +168,14 @@ body {
 }
 
 .chess-board {
-  width: min(100%, 480px);
+  width: min(90vw, 480px);
   aspect-ratio: 1;
+  margin: 12px 0;
 }
 
 .square {
-  width: calc(min(100vw, 480px) / 8);
-  height: calc(min(100vw, 480px) / 8);
+  width: calc(min(90vw, 480px) / 8);
+  height: calc(min(90vw, 480px) / 8);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -235,7 +242,7 @@ body {
 }
 
 .piece {
-  font-size: clamp(24px, 5vw, 40px);
+  font-size: min(5vw, 36px);
   user-select: none;
   transition: transform 0.2s ease;
 }
