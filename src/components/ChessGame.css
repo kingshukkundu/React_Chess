@@ -27,9 +27,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 32px;
+  padding: clamp(16px, 5vw, 32px);
   max-width: 800px;
-  margin: 32px auto;
+  width: 100%;
+  margin: clamp(16px, 5vw, 32px) auto;
   background: #FFFFFF;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
@@ -37,14 +38,15 @@ body {
 
 .game-controls {
   display: flex;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: clamp(8px, 3vw, 20px);
+  margin-bottom: clamp(16px, 5vw, 30px);
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .game-controls button {
-  padding: 12px 24px;
-  font-size: 14px;
+  padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+  font-size: clamp(12px, 3vw, 14px);
   cursor: pointer;
   background-color: var(--secondary-color);
   color: white;
@@ -99,10 +101,11 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
-    margin: 32px auto;
-    padding: 32px;
+    gap: clamp(16px, 4vw, 20px);
+    margin: clamp(16px, 5vw, 32px) auto;
+    padding: clamp(16px, 5vw, 32px);
     max-width: 400px;
+    width: 90%;
     background: #FFFFFF;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -116,8 +119,8 @@ body {
 }
 
 .game-mode-selection button {
-    padding: 12px 24px;
-    font-size: 14px;
+    padding: clamp(8px, 2vw, 12px) clamp(16px, 4vw, 24px);
+    font-size: clamp(12px, 3vw, 14px);
     cursor: pointer;
     background-color: var(--secondary-color);
     color: white;
@@ -158,9 +161,14 @@ body {
   display: flex;
 }
 
+.chess-board {
+  width: min(100%, 480px);
+  aspect-ratio: 1;
+}
+
 .square {
-  width: 60px;
-  height: 60px;
+  width: calc(min(100vw, 480px) / 8);
+  height: calc(min(100vw, 480px) / 8);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -171,8 +179,8 @@ body {
 
 .valid-move-indicator {
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: clamp(12px, 3vw, 16px);
+  height: clamp(12px, 3vw, 16px);
   border-radius: 50%;
   background-color: rgba(0, 122, 255, 0.3);
   pointer-events: none;
@@ -227,7 +235,7 @@ body {
 }
 
 .piece {
-  font-size: 40px;
+  font-size: clamp(24px, 5vw, 40px);
   user-select: none;
   transition: transform 0.2s ease;
 }
@@ -266,8 +274,8 @@ body {
 }
 
 .promotion-piece {
-  width: 60px;
-  height: 60px;
+  width: clamp(40px, 8vw, 60px);
+  height: clamp(40px, 8vw, 60px);
   display: flex;
   justify-content: center;
   align-items: center;
