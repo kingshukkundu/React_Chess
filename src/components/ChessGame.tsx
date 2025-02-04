@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ChessPiece,
   Position,
@@ -15,6 +15,7 @@ import {
   getValidMoves
 } from '../chessRules';
 import './ChessGame.css';
+import { getComputerMove } from '../services/stockfishService';
 
 const createInitialBoard = (): (ChessPiece | null)[][] => {
   const board: (ChessPiece | null)[][] = Array(8).fill(null).map(() => Array(8).fill(null));
@@ -58,7 +59,11 @@ const createInitialBoard = (): (ChessPiece | null)[][] => {
 
 const initialBoard = createInitialBoard();
 
+type GameMode = 'player' | 'computer' | null;
+
 const ChessGame: React.FC = () => {
+  const [gameMode, setGameMode] = useState<GameMode>(null);
+  const [isComputerThinking, setIsComputerThinking] = useState(false);
   const [board, setBoard] = useState<(ChessPiece | null)[][]>(initialBoard);
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
@@ -116,7 +121,115 @@ const ChessGame: React.FC = () => {
 
 
 
+  // Convert board state to FEN notation for Stockfish API
+  const boardToFEN = () => {
+    let fen = '';
+    let emptyCount = 0;
+    
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const piece = board[row][col];
+        if (piece === null) {
+          emptyCount++;
+        } else {
+          if (emptyCount > 0) {
+            fen += emptyCount;
+            emptyCount = 0;
+          }
+          let pieceSymbol = '';
+          switch (piece.type) {
+            case 'pawn': pieceSymbol = 'p'; break;
+            case 'rook': pieceSymbol = 'r'; break;
+            case 'knight': pieceSymbol = 'n'; break;
+            case 'bishop': pieceSymbol = 'b'; break;
+            case 'queen': pieceSymbol = 'q'; break;
+            case 'king': pieceSymbol = 'k'; break;
+          }
+          fen += piece.color === 'white' ? pieceSymbol.toUpperCase() : pieceSymbol;
+        }
+      }
+      if (emptyCount > 0) {
+        fen += emptyCount;
+        emptyCount = 0;
+      }
+      if (row < 7) fen += '/';
+    }
+    
+    fen += ` ${currentPlayer.charAt(0)} KQkq - 0 1`;
+    return fen;
+  };
+
+  // Handle computer's move
+  useEffect(() => {
+    const makeComputerMove = async () => {
+      if (gameMode === 'computer' && currentPlayer === 'black' && !isComputerThinking && !isGameOver) {
+        setIsComputerThinking(true);
+        try {
+          const fen = boardToFEN();
+          const move = await getComputerMove(fen);
+          
+          const fromPos = { 
+            row: 8 - parseInt(move[1]), 
+            col: move.charCodeAt(0) - 97 
+          };
+          const toPos = { 
+            row: 8 - parseInt(move[3]), 
+            col: move.charCodeAt(2) - 97 
+          };
+          
+          const selectedPiece = board[fromPos.row][fromPos.col];
+          if (!selectedPiece) return;
+
+          const newBoard = board.map(row => [...row]);
+          const newGameState = { ...gameState };
+
+          // Update castling rights if moving king or rook
+          if (selectedPiece.type === 'king') {
+            newGameState.castlingRights[selectedPiece.color] = {
+              kingSide: false,
+              queenSide: false
+            };
+          } else if (selectedPiece.type === 'rook') {
+            const side = fromPos.col === 0 ? 'queenSide' : 'kingSide';
+            newGameState.castlingRights[selectedPiece.color][side] = false;
+          }
+
+          // Move the piece
+          newBoard[toPos.row][toPos.col] = {
+            ...selectedPiece,
+            hasMoved: true
+          };
+          newBoard[fromPos.row][fromPos.col] = null;
+
+          setBoard(newBoard);
+          setGameState(newGameState);
+          setCurrentPlayer('white');
+
+          // Check for checkmate or stalemate
+          if (isKingInCheck('white', newBoard) && isCheckmate('white', newBoard)) {
+            setGameStatus('Black wins by checkmate!');
+            setIsGameOver(true);
+          } else if (isStalemate('white', newBoard, newGameState)) {
+            setGameStatus('Game drawn by stalemate!');
+            setIsGameOver(true);
+          } else if (isKingInCheck('white', newBoard)) {
+            setGameStatus('White is in check!');
+          } else {
+            setGameStatus('');
+          }
+        } catch (error) {
+          console.error('Error making computer move:', error);
+        }
+        setIsComputerThinking(false);
+      }
+    };
+
+    makeComputerMove();
+  }, [currentPlayer, gameMode, isGameOver]);
+
   const handleSquareClick = (row: number, col: number) => {
+    // Don't allow moves during computer's turn
+    if (gameMode === 'computer' && currentPlayer === 'black') return;
     // Only block moves if the game is over (checkmate), not when in check
     if (showPromotionDialog || (gameStatus && gameStatus.includes('wins'))) return;
 
@@ -309,10 +422,21 @@ const ChessGame: React.FC = () => {
     });
   };
 
+  if (!gameMode) {
+    return (
+      <div className="game-mode-selection">
+        <h2>Select Game Mode</h2>
+        <button onClick={() => setGameMode('player')}>Play against Player</button>
+        <button onClick={() => setGameMode('computer')}>Play against Computer</button>
+      </div>
+    );
+  }
+
   return (
     <div className="chess-game">
       <div className="game-controls">
         <button onClick={handleRestart}>New Game</button>
+        <button onClick={() => { setGameMode(null); handleRestart(); }}>Change Game Mode</button>
       </div>
       <div className="game-status">
         {gameStatus || `Current player: ${currentPlayer}`}
@@ -320,6 +444,9 @@ const ChessGame: React.FC = () => {
           <button onClick={handleRestart} className="restart-button">
             Restart Game
           </button>
+        )}
+        {gameMode === 'computer' && currentPlayer === 'black' && isComputerThinking && (
+          <div className="thinking-indicator">Computer is thinking...</div>
         )}
       </div>
       <div className="chess-board">
