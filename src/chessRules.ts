@@ -183,7 +183,7 @@ export const isBishopMove = (
   let currentRow = from.row + rowDir;
   let currentCol = from.col + colDir;
   
-  while (currentRow !== to.row && currentCol !== to.col) {
+  while (currentRow !== to.row || currentCol !== to.col) {
     if (board[currentRow][currentCol]) return false;
     currentRow += rowDir;
     currentCol += colDir;
