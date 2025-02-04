@@ -1,0 +1,37 @@
+.app {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #282c34;
+  color: white;
+}
+
+.app-header {
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2.5em;
+  color: #61dafb;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.app-footer {
+  padding: 20px;
+  background-color: #20232a;
+}
+
+.app-footer p {
+  margin: 0;
+  color: #8d96a7;
+}
